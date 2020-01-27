@@ -1,44 +1,108 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+### variable
+ |        特性        | `plain variable` | `state` | `ref` |
+ | :----------------: | :--------------: | :-----: | :---: |
+ | 渲染后引用是否相同 |        ❎         |    ❎    |   ✔   |
+ |   是否可以update   |        ❎         |    ✔    |   ✔   |
 
-## Available Scripts
+### useContext vs redux
+- useContext的变化会引起中间组件的重新渲染
+- store的变化只会引起相关组件的重新渲染
 
-In the project directory, you can run:
+### useRef
+- 持久化的引用，只有`current`可用
+- 可以用来获取`dom`
 
-### `yarn start`
+### useMemo vs useCallback vs memo
+- `useMemo`用来**缓存**`昂贵计算`的**值**, 也可以缓存`组件`
+- `useCallback`用来**持久化**函数的`引用`
+- `memo`用来缓存`组件`, 可以避免由`父组件渲染`引起的**不必要**的`子组件渲染`
+- 
 
-Runs the app in the development mode.<br />
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+### useEffect vs useLayoutEffect
+<div style="text-align:center; margin:auto"><img src="img/2020-01-27-10-16-05.png"></div>
 
-The page will reload if you make edits.<br />
-You will also see any lint errors in the console.
+- [useEffect 和 useLayoutEffect 的区别](https://juejin.im/post/5de38c76e51d455f9b335eff)
+- [react hook——你可能不是“我”所认识的useEffect](https://imweb.io/topic/5cd845cadcd62f86299fcd76)
 
-### `yarn test`
 
-Launches the test runner in the interactive watch mode.<br />
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### useContext
+- 创建context
+  - defaultContext是在没有provider的情况下，传给consumer或者useContext的默认值，但是是不可变的，无法通过setContext来变更。
+```javascript
+// userContext.js
+import { createContext } from 'react';
 
-### `yarn build`
+const UserContext = createContext([
+  {
+    firstName: 'Bob',
+    lastName: 'Bobberson',
+    suffix: 1,
+    email: 'bobberson@example.com'
+  },
+  obj => obj
+])
+const { Provider } = UserContext;
+export { Provider, UserContext }
+```
+- 创建Provider
+```javascript
+const UseContext = () => {
+  // 这个才是人类理解的默认值，可通过setContext来变更
+  const user = useState({
+    firstName: 'James',
+    lastName: 'Tan',
+    suffix: 1,
+    email: 'james@example.com'
+  })
 
-Builds the app for production to the `build` folder.<br />
-It correctly bundles React in production mode and optimizes the build for the best performance.
+  return (
+    <div>
+      <Provider value={user}>
+        <h1>1st level</h1>
+        <Level2></Level2>
+      </Provider>
+    </div>
+    //  
+  )
+}
+```
+- 创建Consumer
+```javascript
+const Level5 = () => {
+  // 接收context
+  const [user, setUser] = useContext<any>(UserContext);
+  return (
+    <div>
+      <h5>{`${user.firstName} ${user.lastName} the ${user.suffix} born`}</h5>
+      <button onClick={() => { setUser({ ...user, suffix: user.suffix + 1 }) }}>Increment</button>
+    </div>
+  )
+}
+```
 
-The build is minified and the filenames include the hashes.<br />
-Your app is ready to be deployed!
+### forwardRef
+- 能够跟`useRef`一起获得子组件的`DOM`
+- 在`父组件`创建`ref`,传递到`子组件`, 在`父组件`获取`DOM`
+```javascript
+const FancyButton = React.forwardRef((props, ref) => (
+  <button ref={ref} className="FancyButton">
+    {props.children}
+  </button>
+));
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+// You can now get a ref directly to the DOM button:
+const ref = React.createRef();
+<FancyButton ref={ref}>Click me!</FancyButton>;
+```
 
-### `yarn eject`
+### useImperativeHandle
+- 结合`useRef`和`forwardRef`, 允许`子组件`将操作**自身DOM**的`函数`传递给`父组件`(向上传递)
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+### 零碎
+- `htmlFor` for `for`
+- `Context` + `useReducer` = `Redux`; 其实还是redux的方案更好，context其实只是props多层传递的一种简化而已。
+- `styled-component`: `emotion.sh` 将css复用粒度提升tag层面到了component层面，但是加快了开发速度，可以适用于小型项目。
+- `styled-component`高亮插件: `vscode-styled-component`
+- `sass`: `yarn add node-sass`
+- `setState`: hooks是function之外的又一层，写在代码里的顺序，不一定是它真实的执行顺序
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (Webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
