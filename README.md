@@ -10,13 +10,13 @@
 
 ### useRef
 - 持久化的引用，只有`current`可用
-- 可以用来获取`dom`
+- 可以用来获取或者添加`dom node`
 
 ### useMemo vs useCallback vs memo
 - `useMemo`用来**缓存**`昂贵计算`的**值**, 也可以缓存`组件`
 - `useCallback`用来**持久化**函数的`引用`
 - `memo`用来缓存`组件`, 可以避免由`父组件渲染`引起的**不必要**的`子组件渲染`
-- 
+
 
 ### useEffect vs useLayoutEffect
 <div style="text-align:center; margin:auto"><img src="img/2020-01-27-10-16-05.png"></div>
